@@ -4,24 +4,45 @@
 
 use defmt::*;
 use embassy_executor::Spawner;
+use embassy_stm32::adc::Adc;
 use embassy_stm32::gpio::{Level, Output, Speed};
+use embassy_stm32::pwm::simple_pwm::{PwmPin, SimplePwm};
+use embassy_stm32::pwm::{self, Channel};
+use embassy_stm32::time::{hz, khz};
+use embassy_stm32::usart::{Config, UartTx};
+use embassy_time::Delay;
 use embassy_time::{Duration, Timer};
 use {defmt_rtt as _, panic_probe as _};
 
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
-    let p = embassy_stm32::init(Default::default());
+    let mut p = embassy_stm32::init(Default::default());
     info!("Hello World!");
 
-    let mut led = Output::new(p.PB7, Level::High, Speed::Low);
+    let mut led = Output::new(p.PA5, Level::High, Speed::Low);
+    let mut delay = Delay;
+    let mut adc = Adc::new(p.ADC1, &mut delay);
 
+    let servo_pin = PwmPin::new_ch2(p.PB3);
+    let mut pwm = SimplePwm::new(p.TIM2, None, Some(servo_pin), None, None, hz(50));
+    let max_duty = pwm.get_max_duty();
+
+    pwm.enable(Channel::Ch2);
     loop {
-        info!("high");
         led.set_high();
-        Timer::after(Duration::from_millis(300)).await;
+        let sample = adc.read(&mut p.PA0);
+        let percent = sample as f32 / 4096.0;
+        // servo is 50hz, 20ms period, 1ms to 2ms duty cycle
+        let period_duration = max_duty as f32 / 20.0;
+        let duty = ((1.0 + percent) * period_duration) as u16;
 
-        info!("low");
+        pwm.set_duty(
+            Channel::Ch2,
+            duty,
+        );
+
+        info!("outputting {}/{} ({}%)", duty, max_duty, percent * 100.0);
         led.set_low();
-        Timer::after(Duration::from_millis(300)).await;
+        Timer::after(Duration::from_millis(10)).await;
     }
 }
