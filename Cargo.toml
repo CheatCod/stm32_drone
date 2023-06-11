@@ -9,7 +9,7 @@ edition = "2021"
 embassy-sync = { version = "0.2.0", path = "deps/embassy-sync", features = ["defmt"] }
 embassy-executor = { version = "0.2.0", path ="deps/embassy-executor", features = ["nightly", "arch-cortex-m", "executor-thread", "executor-interrupt", "defmt", "integrated-timers", "arch-cortex-m", "executor-thread", "executor-interrupt"] }
 embassy-time = { version = "0.1.0", path = "deps/embassy-time", features = ["defmt", "defmt-timestamp-uptime", "unstable-traits", "tick-hz-32_768"] }
-embassy-stm32 = { version = "0.1.0", path = "deps/embassy-stm32", features = ["nightly", "unstable-traits", "defmt", "stm32f429zi", "unstable-pac", "memory-x", "time-driver-any", "exti", "embedded-sdmmc", "chrono"]  }
+embassy-stm32 = { version = "0.1.0", path = "deps/embassy-stm32", features = ["nightly", "unstable-traits", "defmt", "unstable-pac", "memory-x", "stm32f401re", "time-driver-tim3", "exti","embedded-sdmmc", "chrono"]  }
 
 defmt = "0.3"
 defmt-rtt = "0.4"
