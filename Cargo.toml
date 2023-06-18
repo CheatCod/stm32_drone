@@ -29,3 +29,16 @@ chrono = { version = "^0.4", default-features = false}
 
 [profile.release]
 debug = 2
+
+[[bin]]
+name = "setup_bin"
+path = "src/bin/setup_bin.rs"
+
+[[bin]]
+name = "main"
+path = "src/main.rs"
+
+[[bin]]
+name = "test_motor"
+path = "src/bin/test_motor.rs"
+
